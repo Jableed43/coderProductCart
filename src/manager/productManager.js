@@ -52,16 +52,28 @@ export default class ProductManager {
         }
     }
 
-    async updateById (id, prop, nuevoValor) {
+    async updateById (id, nuevoValor) {
+       const products = await this.getProducts();
+        
         try {
-            const productos = await this.getProducts();
-            const producto = productos.find(elemento => elemento.id === id);
-            producto[prop] = nuevoValor
-            return producto
+            const updateProducts = products.map((product) => {
+                if (product.id === id) {
+                    product = nuevoValor
+                    return { ...product, id};
+                }
+                else {
+                    return { ...product }
+                }
+            });
+            await fs.promises.writeFile(
+                this.path, JSON.stringify(updateProducts)
+            )
+
         } catch (error) {
             console.log(error)
         }
-    }
+        }
+   
 
     async deleteById (id) {
         try {
@@ -76,51 +88,5 @@ export default class ProductManager {
 
     async deleteAll () {
         await fs.promises.writeFile(this.path, JSON.stringify([], null, 2));
-    }
-
-    async getCarts () {
-        try {
-            const contenido = await fs.promises.readFile(this.path, 'utf-8')
-            if (contenido.length > 0) {
-                const cart = JSON.parse(contenido)
-                return cart
-            } else {
-                return []
-            }
-        } catch (error) {
-            return 'El archivo no puede ser leido'
-        }
-    }
-
-    async getCartById (id) {
-        try {
-            const carts = await this.getCarts();
-            const cart = carts.find(elemento => elemento.id === id);
-            return cart
-        } catch (error) {
-            return 'No es posible encontrar el carrito indicado'
-        }
-    }
-
-    async addCarts (cart) {
-        try {
-            if (fs.existsSync(this.path)) {
-                const carts = await this.getCarts();
-                if (carts.length > 0) {
-                    const ultimoId = carts[carts.length - 1].id + 1
-                    cart.id = ultimoId
-                    carts.push(cart)
-                    await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2))
-                } else {
-                    cart.id = 1
-                    await fs.promises.writeFile(this.path, JSON.stringify([cart], null, 2))
-                }
-            } else {
-                cart.id = 1
-                await fs.promises.writeFile(this.path, JSON.stringify([cart], null, 2))
-            }
-        } catch (error) {
-            return "El producto no pudo ser guardado";
-        }
     }
 }

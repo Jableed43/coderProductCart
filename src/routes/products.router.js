@@ -30,38 +30,10 @@ productsRouter.post('/', async (req, res) => {
 })
 
 productsRouter.put('/:pid', async (req, res) => {
-    // try {
-    //     const productId = Number(req.params.pid)
-    //     const products = await productManager.getProducts()
-    //     const index = products.findIndex((elemId) => elemId.id === productId)
-
-    //     if (index < 0) {
-    //         return res.status(404).json({
-    //             msg: `El producto con id ${id} no existe`,
-    //           });
-    //     }
-
-    //     products[index] = {
-    //         id: productId,
-    //         titulo: req.body.titulo,
-    //         descripcion: req.body.descripcion,
-    //         codigo: req.body.codigo,
-    //         precio: req.body.precio,
-    //         estado: req.body.estado,
-    //         stock: req.body.stock,
-    //         categoria: req.body.categoria
-    //     }
-
-    //     await productManager.getProducts(products)
-
-    //     res.send({message: 'Producto actualizado'})
-        
-    // } catch (error) {
-    //     console.log(error)
-    // }
-    const product = Number(req.params.pid)
-    const updateProduct = await productManager.updateById(product)
-    res.send({message: 'Producto actualizado'})
+    const productId = Number(req.params.pid)
+    const newProduct = req.body
+    await productManager.updateById(productId, newProduct)
+    res.send({message: 'Producto actualizado', producto: newProduct, id: productId})
 })
 
 productsRouter.delete('/:pid', async (req, res) => {
